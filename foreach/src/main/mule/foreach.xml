@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5fcef769-5ff5-449d-bc73-e34c2af0504c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="21b98bbe-c465-4c35-8ce9-267946400f50" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Airtel@9652614644" />
+	</db:config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="0388b845-1f54-4b01-bef2-dd351be78f9f" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Airtel@9652614644" database="db1" />
+	</db:config>
+	<db:config name="Database_Config2" doc:name="Database Config" doc:id="504c2acc-da38-437d-b9e1-080e16969380" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Airtel@9652614644" database="db1" />
+	</db:config>
+	<flow name="Flow" doc:id="ce034082-0ad2-4bb6-940d-4ebfab7a5305" >
+		<http:listener doc:name="INPUT" doc:id="fe67aa9f-3522-4705-8d3e-e1c14e4e99a5" config-ref="HTTP_Listener_config" path="foreach"/>
+		<ee:transform doc:name="LOAD AND DISPATCH" doc:id="f4ca34da-ac97-450a-b773-fa1b8167184b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+1 to 100 map
+{
+  id: 200+$$,
+  name: "shiva",
+  number: 1234567890,
+  lname: "reddy"	
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<batch:job jobName="foreachBatch_Job" doc:id="cfe48ff2-58be-4b4f-80b1-9cb030197c3b" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="8f7575c8-9355-48f2-8744-ba61925d915c" >
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="991336a0-1f04-4297-bbc0-77b800c375a2" size="20">
+						<logger level="INFO" doc:name="Logger" doc:id="a0df3911-7466-4d45-8fb9-8bd599f932f9" message="#[payload]"/>
+						<db:bulk-insert doc:name="Bulk insert" doc:id="20719e74-df44-4fa8-931c-c93cd09ac2e5" config-ref="Database_Config2">
+							<db:sql ><![CDATA[INSERT INTO student (id, name, number, lname)
+VALUES (:id, :name, :number, :lname);]]></db:sql>
+						</db:bulk-insert>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<ee:transform doc:name="ONCOMPLETE" doc:id="170598c3-a768-471d-b2e2-dd8ee71ab7ff">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+ payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+</mule>
