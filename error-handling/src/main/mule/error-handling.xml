@@ -12,6 +12,11 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	<flow name="error-handlingFlow" doc:id="785a0376-1221-47c7-b758-4b7afda6ccc0" >
 		<http:listener doc:name="Listener" doc:id="170c2ed8-eb91-492b-9814-5ca2f9beb080" config-ref="HTTP_Listener_config" path="error"/>
 		<logger level="INFO" doc:name="Logger" doc:id="0f71bf80-9f18-4052-bef7-c2facb3e2f66" message="raise error"/>
+<<<<<<< HEAD
+=======
+		<logger level="INFO" doc:name="Logger" doc:id="afefc662-c9e6-4388-8f7b-3e84016eb30a" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="afefc662-c9e6-4388-8f7b-3e84016eb30a" message="#[payload]"/>
+>>>>>>> 98e3ba727f16a96b98a31178aa1a3b1cab459b29
 		<set-variable value="#[attributes.queryParams.amount]" doc:name="Set Variable" doc:id="d4602c3d-2058-4dbf-a59c-63073c41b2b2" variableName="amount"/>
 		<choice doc:name="Choice" doc:id="fbfefeaa-531d-430a-bb0f-fa55d325798c" >
 			<when expression="#[vars.amount &lt;=500]">
