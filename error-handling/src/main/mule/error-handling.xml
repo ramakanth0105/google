@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="480c43ae-d1ef-4b35-bfdd-de3b1f90a980" >
+		<db:my-sql-connection host="localhost" port="3022" user="ramakanth" password="asdaff" />
+	</db:config>
+	<flow name="error-handlingFlow" doc:id="785a0376-1221-47c7-b758-4b7afda6ccc0" >
+		<http:listener doc:name="Listener" doc:id="170c2ed8-eb91-492b-9814-5ca2f9beb080" config-ref="HTTP_Listener_config" path="error"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0f71bf80-9f18-4052-bef7-c2facb3e2f66" message="raise error"/>
+		<set-variable value="#[attributes.queryParams.amount]" doc:name="Set Variable" doc:id="d4602c3d-2058-4dbf-a59c-63073c41b2b2" variableName="amount"/>
+		<choice doc:name="Choice" doc:id="fbfefeaa-531d-430a-bb0f-fa55d325798c" >
+			<when expression="#[vars.amount &lt;=500]">
+				<ee:transform doc:name="Transform Message" doc:id="cf632ef6-cf61-4e19-99a2-43f0bbbb34d8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "successfull"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="1bbfb223-474f-4a82-b6e5-9a6ff03846f6" type="IF:INSUFFICENT" description="insufficent funds"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

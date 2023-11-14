@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="62f84e12-7a1e-48fd-a309-796feb233e26" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<error-handler name="globalError_Handler" doc:id="05b9c06a-ccba-4f99-9dac-1258f39c52b6" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="071370a4-ef1e-48cf-997d-7bd8512a230e" >
+			<ee:transform doc:name="Transform Message" doc:id="306366fb-b41f-447b-95b2-b037391fd960" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "success"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+	</error-handler>
+</mule>
